@@ -1,5 +1,6 @@
 import gymnasium as gym
 import torch
+import numpy as np
 
 class Engine:
     """Defines the environment function from the generator engine.
@@ -15,13 +16,25 @@ class Engine:
     def reset(self):
         """Fully reset the environment."""
         obs, _ = self.Environment.reset(seed=42)
-        return torch.tensor(obs['image'])
+        observation = []
+        for row in obs['image']:
+            for column in row:
+                for item in column:
+                    observation.append(np.float32(item))
+        observation = torch.tensor(observation)
+        return observation
     
     def step(self, state:any, action:any):
         """Enact an action."""           
         obs, reward, terminated, _, _ = self.Environment.step(action)
         # Only use rgb-array for observation (ignore direction)
-        return torch.tensor(obs['image']), reward, terminated
+        observation = []
+        for row in obs['image']:
+            for column in row:
+                for item in column:
+                    observation.append(np.float32(item))
+        observation = torch.tensor(observation)
+        return observation, reward, terminated
 
     def legal_move_generator(self, obs:any=None):
         """Define legal moves at each position"""
