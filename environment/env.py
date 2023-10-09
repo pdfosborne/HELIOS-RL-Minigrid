@@ -21,7 +21,7 @@ class Environment:
     def __init__(self, local_setup_info: dict):
         # --- INIT env from engine
         self.env = Engine()
-        self.start_obs = self.env.reset()
+        self.start_obs = 'START'
         # ---
         # --- PRESET HELIOS INFO
         # Agent
@@ -56,7 +56,7 @@ class Environment:
             action_history = []
             # ---
             # Start observation is used instead of .reset() fn so that this can be overriden for repeat analysis from the same start pos
-            obs = self.start_obs
+            obs = self.env.reset()
             legal_moves = self.env.legal_move_generator(obs)
             state = self.agent_state_adapter.adapter(state=obs, legal_moves=legal_moves, episode_action_history=action_history, encode=True)
             # ---

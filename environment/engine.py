@@ -1,3 +1,5 @@
+import gymnasium as gym
+import torch
 
 class Engine:
     """Defines the environment function from the generator engine.
@@ -8,25 +10,23 @@ class Engine:
     """
     def __init__(self) -> None:
         """Initialize Engine"""
-        self.Environment = "Engine Initialization"
-        
+        self.Environment = gym.make("MiniGrid-Empty-5x5-v0", render_mode="rgb_array")
+
     def reset(self):
         """Fully reset the environment."""
-        obs, _ = self.Environment.reset()
-        return obs
-
+        obs, _ = self.Environment.reset(seed=42)
+        return torch.tensor(obs['image'])
     
     def step(self, state:any, action:any):
-        """Enact an action."""
-        # In problems where the agent can choose to reset the env
-        if (state=="ENV_RESET")|(action=="ENV_RESET"):
-            self.reset()
-            
-        obs, reward, terminated = self.Environment.step(action)
-        return obs, reward, terminated
+        """Enact an action."""           
+        obs, reward, terminated, _, _ = self.Environment.step(action)
+        # Only use rgb-array for observation (ignore direction)
+        return torch.tensor(obs['image']), reward, terminated
 
     def legal_move_generator(self, obs:any=None):
         """Define legal moves at each position"""
-        legal_moves = self.Environment.legal_moves(obs)
+        # The agents have a discrete action space (A) of seven options representing 
+        # [“turn left”, “turn right”, “move forward”, “pickup”, “drop”, “toggle”, “done”]. 
+        legal_moves = [0,1,2,3,4,5,6] #self.Environment.legal_moves(obs)
         return legal_moves
 
